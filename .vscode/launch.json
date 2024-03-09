@@ -1,0 +1,34 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "dev",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--no-pub",
+                "--web-port=8091",
+            ],
+        },
+        {
+            "name": "profile",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "args": [
+                "--no-pub",
+                "--web-port=8092",
+            ],
+        },
+        {
+            "name": "release",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "args": [
+                "--no-pub",
+                "--web-port=8093",
+            ],
+        }
+    ]
+}
