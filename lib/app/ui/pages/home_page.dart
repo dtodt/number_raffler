@@ -24,35 +24,42 @@ class _HomePageState extends State<HomePage> {
     final config = configState.value;
     final active = config is ConfigActive;
     if (active && draws.length < config.slots) {
-      action = FloatingActionButton(
-        onPressed: drawNext.call,
-        tooltip: 'Increment',
-        child: const Icon(Icons.plus_one_rounded),
+      action = Semantics(
+        label: 'Generate number',
+        child: FloatingActionButton(
+          onPressed: drawNext.call,
+          tooltip: 'Increment',
+          child: const Icon(Icons.plus_one_rounded),
+        ),
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (keyboardSize == 0 && active && drawLast != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Center(
-                  child: SizedBox.square(
-                    dimension: 75.0,
-                    child: CircleAvatar(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Center(
-                          child: FittedBox(
-                            child: Text(
-                              '$drawLast',
-                              style: Theme.of(context).textTheme.displayLarge,
+    return Semantics(
+      label: 'Home page',
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text(widget.title),
+        ),
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (keyboardSize == 0 && active && drawLast != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: Center(
+                    child: SizedBox.square(
+                      dimension: 75.0,
+                      child: CircleAvatar(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Center(
+                            child: FittedBox(
+                              child: Text(
+                                '$drawLast',
+                                style: Theme.of(context).textTheme.displayLarge,
+                              ),
                             ),
                           ),
                         ),
@@ -60,31 +67,31 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
+              Expanded(
+                child: ListView.separated(
+                  itemBuilder: _item,
+                  itemCount: draws.length,
+                  padding: const EdgeInsets.all(16.0),
+                  physics: const BouncingScrollPhysics(),
+                  separatorBuilder: _separator,
+                ),
               ),
-            Expanded(
-              child: ListView.separated(
-                itemBuilder: _item,
-                itemCount: draws.length,
+              Padding(
                 padding: const EdgeInsets.all(16.0),
-                physics: const BouncingScrollPhysics(),
-                separatorBuilder: _separator,
+                child: ConfigWidget(
+                  onReset: configReset.call,
+                  onSubmit: configSet.setValue,
+                  value: configState.value.slots,
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ConfigWidget(
-                onReset: configReset.call,
-                onSubmit: configSet.setValue,
-                value: configState.value.slots,
-              ),
-            ),
-            const SizedBox(height: 24.0),
-          ],
+              const SizedBox(height: 24.0),
+            ],
+          ),
         ),
+        floatingActionButton: action,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        resizeToAvoidBottomInset: true,
       ),
-      floatingActionButton: action,
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      resizeToAvoidBottomInset: true,
     );
   }
 

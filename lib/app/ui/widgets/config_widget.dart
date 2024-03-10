@@ -40,6 +40,10 @@ class _ConfigWidgetState extends State<ConfigWidget> {
       ConfigActive() => widget.onReset,
       ConfigInactive() => _submit,
     };
+    final actionLabel = switch (configState.value) {
+      ConfigActive() => 'Reset configuration',
+      ConfigInactive() => 'Configure',
+    };
 
     var color = switch (configState.value) {
       ConfigActive() => Colors.green,
@@ -77,85 +81,91 @@ class _ConfigWidgetState extends State<ConfigWidget> {
                 children: [
                   const SizedBox.square(dimension: 38.0),
                   const SizedBox(width: 16.0),
-                  SizedBox(
-                    width: 100.0,
-                    child: TextFormField(
-                      autofocus: true,
-                      buildCounter: _buildCounter,
-                      cursorColor: color.shade900,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: color.shade900,
+                  Semantics(
+                    label: 'Number slots',
+                    child: SizedBox(
+                      width: 100.0,
+                      child: TextFormField(
+                        autofocus: true,
+                        buildCounter: _buildCounter,
+                        cursorColor: color.shade900,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: color.shade900,
+                            ),
                           ),
-                        ),
-                        errorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: color.shade900,
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: color.shade900,
+                            ),
                           ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: color.shade900,
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: color.shade900,
+                            ),
                           ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: color.shade900,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: color.shade900,
+                            ),
                           ),
-                        ),
-                        disabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: color.shade900,
+                          disabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: color.shade900,
+                            ),
                           ),
+                          filled: true,
+                          fillColor: color.shade100,
+                          focusColor: color.shade900,
                         ),
-                        filled: true,
-                        fillColor: color.shade100,
-                        focusColor: color.shade900,
-                      ),
-                      enabled: enabled,
-                      focusNode: _fieldFocus,
-                      initialValue: initialValue,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.digitsOnly
-                      ],
-                      keyboardType: TextInputType.number,
-                      maxLength: 3,
-                      onChanged: (value) {
-                        setState(() {
-                          _number = int.tryParse(value) ?? 0;
+                        enabled: enabled,
+                        focusNode: _fieldFocus,
+                        initialValue: initialValue,
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        keyboardType: TextInputType.number,
+                        maxLength: 3,
+                        onChanged: (value) {
+                          setState(() {
+                            _number = int.tryParse(value) ?? 0;
 
-                          if (AutovalidateMode.onUserInteraction ==
-                              _autoValidate) {
-                            _formValid = _number > 1;
+                            if (AutovalidateMode.onUserInteraction ==
+                                _autoValidate) {
+                              _formValid = _number > 1;
+                            }
+                          });
+                        },
+                        onFieldSubmitted: _submit,
+                        style: TextStyle(
+                          color: color.shade900,
+                        ),
+                        textAlign: TextAlign.center,
+                        textInputAction: TextInputAction.send,
+                        validator: (value) {
+                          final numberValue = int.tryParse(value ?? '0') ?? 0;
+                          if (numberValue > 1) {
+                            return null;
                           }
-                        });
-                      },
-                      onFieldSubmitted: _submit,
-                      style: TextStyle(
-                        color: color.shade900,
+                          return '';
+                        },
                       ),
-                      textAlign: TextAlign.center,
-                      textInputAction: TextInputAction.send,
-                      validator: (value) {
-                        final numberValue = int.tryParse(value ?? '0') ?? 0;
-                        if (numberValue > 1) {
-                          return null;
-                        }
-                        return '';
-                      },
                     ),
                   ),
                   const SizedBox(width: 16.0),
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
-                    child: IconButton(
-                      style: IconButton.styleFrom(
-                        backgroundColor: colorReverse.shade100,
-                        foregroundColor: colorReverse.shade900,
+                    child: Semantics(
+                      label: actionLabel,
+                      child: IconButton(
+                        style: IconButton.styleFrom(
+                          backgroundColor: colorReverse.shade100,
+                          foregroundColor: colorReverse.shade900,
+                        ),
+                        onPressed: action,
+                        icon: icon,
                       ),
-                      onPressed: action,
-                      icon: icon,
                     ),
                   ),
                 ],
