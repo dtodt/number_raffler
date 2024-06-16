@@ -1,4 +1,3 @@
-import 'package:asp/asp.dart' show RxRoot;
 import 'package:flutter/foundation.dart' show debugPrint, kReleaseMode;
 import 'package:flutter/material.dart' show runApp, WidgetsFlutterBinding;
 import 'package:flutter/services.dart' show SystemChrome, DeviceOrientation;
@@ -23,5 +22,5 @@ void main() {
 
   registerInstances();
 
-  runApp(const RxRoot(child: AppWidget()));
+  runApp(const AppWidget());
 }
