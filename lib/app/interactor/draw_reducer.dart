@@ -8,6 +8,7 @@ class DrawReducer extends Reducer {
   DrawReducer() {
     on(() => [drawNext], () {
       final slots = configState.value.slots;
+      final draws = drawState.value;
       if (draws.length >= slots) return;
 
       var next = 0;

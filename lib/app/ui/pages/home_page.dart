@@ -1,8 +1,7 @@
-import 'package:asp/asp.dart';
 import 'package:flutter/material.dart';
+import 'package:hook_state/hook_state.dart';
 
 import 'package:number_raffler/app/interactor/atoms.dart';
-import 'package:number_raffler/app/interactor/config_states.dart';
 import 'package:number_raffler/app/ui/widgets/config_widget.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,16 +13,18 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with HookStateMixin {
   @override
   Widget build(BuildContext context) {
     final keyboardSize = MediaQuery.viewInsetsOf(context).bottom;
-    context.select(() => [draws, configState]);
+
+    final canDraw = useValueListenable(canDrawSelector);
+    final hasDraw = useValueListenable(hasDrawSelector);
+    final lastDraw = useValueListenable(drawLastSelector);
+    final totalDraws = useValueListenable(drawsCountSelector);
 
     Widget? action;
-    final config = configState.value;
-    final active = config is ConfigActive;
-    if (active && draws.length < config.slots) {
+    if (canDraw) {
       action = Semantics(
         label: 'Generate number',
         child: FloatingActionButton(
@@ -45,7 +46,7 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (keyboardSize == 0 && active && drawLast != null)
+              if (keyboardSize == 0 && hasDraw)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: Center(
@@ -57,7 +58,7 @@ class _HomePageState extends State<HomePage> {
                           child: Center(
                             child: FittedBox(
                               child: Text(
-                                '$drawLast',
+                                '$lastDraw',
                                 style: Theme.of(context).textTheme.displayLarge,
                               ),
                             ),
@@ -70,7 +71,7 @@ class _HomePageState extends State<HomePage> {
               Expanded(
                 child: ListView.separated(
                   itemBuilder: _item,
-                  itemCount: draws.length,
+                  itemCount: totalDraws,
                   padding: const EdgeInsets.all(16.0),
                   physics: const BouncingScrollPhysics(),
                   separatorBuilder: _separator,
@@ -98,6 +99,7 @@ class _HomePageState extends State<HomePage> {
   Widget? _item(BuildContext context, int index) {
     if (index == 0) return const SizedBox();
 
+    final draws = useValueListenable(drawsSelector);
     final item = draws.elementAt(index);
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -108,7 +110,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _separator(BuildContext context, int index) {
     final colorScheme = Theme.of(context).colorScheme;
-    final background = colorScheme.background;
+    final background = colorScheme.surface;
     final center = colorScheme.tertiaryContainer;
     final centerText = colorScheme.onTertiary;
 
