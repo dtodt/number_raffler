@@ -29,10 +29,10 @@ packages:
     dependency: "direct main"
     description:
       name: asp
-      sha256: "97acd3bceceea0b12dd8001a60b577eee5d4ae695c518d2ed8e93b59fbb3e798"
+      sha256: cfaf58da99e1f1f189d40e0d105d46cc953099fe8c4f2f5f03d973245486e49f
       url: "https://pub.dev"
     source: hosted
-    version: "1.3.0"
+    version: "2.0.0"
   async:
     dependency: transitive
     description:
@@ -177,7 +177,7 @@ packages:
     source: sdk
     version: "0.0.0"
   hook_state:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: hook_state
       sha256: eed5b48b6000225b74fe53dc04281fc7f0412c3d3ad5b8e79be02fda6d6476b7
@@ -365,14 +365,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.4.0"
-  value_selectable:
-    dependency: "direct main"
-    description:
-      name: value_selectable
-      sha256: "2bed17652c7702014b96aca08fb7c24a51778f1a9a4b249af9cf508cb928c728"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0+2"
   vector_math:
     dependency: transitive
     description:

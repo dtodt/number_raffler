@@ -1,7 +1,7 @@
+import 'package:asp/asp.dart';
 import 'package:flutter/material.dart';
-import 'package:hook_state/hook_state.dart';
 
-import 'package:number_raffler/app/interactor/atoms.dart';
+import 'package:number_raffler/app/interactor/config_atoms.dart';
 import 'package:number_raffler/app/ui/widgets/config_widget.dart';
 
 class HomePage extends StatefulWidget {
@@ -18,10 +18,10 @@ class _HomePageState extends State<HomePage> with HookStateMixin {
   Widget build(BuildContext context) {
     final keyboardSize = MediaQuery.viewInsetsOf(context).bottom;
 
-    final canDraw = useValueListenable(canDrawSelector);
-    final hasDraw = useValueListenable(hasDrawSelector);
-    final lastDraw = useValueListenable(drawLastSelector);
-    final totalDraws = useValueListenable(drawsCountSelector);
+    final canDraw = useAtomState(canDrawSelector);
+    final hasDraw = useAtomState(hasDrawSelector);
+    final lastDraw = useAtomState(drawLastSelector);
+    final totalDraws = useAtomState(drawsCountSelector);
 
     Widget? action;
     if (canDraw) {
@@ -81,8 +81,8 @@ class _HomePageState extends State<HomePage> with HookStateMixin {
                 padding: const EdgeInsets.all(16.0),
                 child: ConfigWidget(
                   onReset: configReset.call,
-                  onSubmit: configSet.setValue,
-                  value: configState.value.slots,
+                  onSubmit: configSet.call,
+                  value: configState.state.slots,
                 ),
               ),
               const SizedBox(height: 24.0),
@@ -99,7 +99,7 @@ class _HomePageState extends State<HomePage> with HookStateMixin {
   Widget? _item(BuildContext context, int index) {
     if (index == 0) return const SizedBox();
 
-    final draws = useValueListenable(drawsSelector);
+    final draws = useAtomState(drawsSelector);
     final item = draws.elementAt(index);
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(vertical: 8.0),

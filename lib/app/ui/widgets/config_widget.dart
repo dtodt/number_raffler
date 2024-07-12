@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:number_raffler/app/interactor/atoms.dart';
+import 'package:number_raffler/app/interactor/config_atoms.dart';
 import 'package:number_raffler/app/interactor/config_states.dart';
 
 class ConfigWidget extends StatefulWidget {
@@ -36,16 +36,16 @@ class _ConfigWidgetState extends State<ConfigWidget> {
       initialValue = '${widget.value}';
     }
 
-    final action = switch (configState.value) {
+    final action = switch (configState.state) {
       ConfigActive() => widget.onReset,
       ConfigInactive() => _submit,
     };
-    final actionLabel = switch (configState.value) {
+    final actionLabel = switch (configState.state) {
       ConfigActive() => 'Reset configuration',
       ConfigInactive() => 'Configure',
     };
 
-    var color = switch (configState.value) {
+    var color = switch (configState.state) {
       ConfigActive() => Colors.green,
       ConfigInactive() => Colors.blue,
     };
@@ -53,14 +53,14 @@ class _ConfigWidgetState extends State<ConfigWidget> {
       color = Colors.red;
     }
 
-    final colorReverse = switch (configState.value) {
+    final colorReverse = switch (configState.state) {
       ConfigActive() => Colors.blue,
       ConfigInactive() => Colors.green,
     };
 
-    final enabled = configState.value is ConfigInactive;
+    final enabled = configState.state is ConfigInactive;
 
-    final icon = switch (configState.value) {
+    final icon = switch (configState.state) {
       ConfigActive() => const Icon(Icons.replay_rounded),
       ConfigInactive() => const Icon(Icons.check),
     };
