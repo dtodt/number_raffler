@@ -23,9 +23,9 @@ dependencies:
   flutter:
     sdk: flutter
 
-  asp: ^2.0.0
-  auto_injector: ^2.0.4
-  flutter_native_splash: ^2.4.0
+  asp: ^2.0.2
+  auto_injector: ^2.0.5
+  flutter_native_splash: ^2.4.1
   flutter_screenutil: ^5.9.3
 
 dev_dependencies:
