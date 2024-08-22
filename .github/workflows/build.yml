@@ -1,46 +1,81 @@
-# Note: In a yml each level is padded by 2 spaces
-name: Flutter
+name: Flutter Android
 
 on:
-  # Runs this action when you push on master
-  push:
-    branches: ["master"]
-  # Runs this when a PR against master is created
   pull_request:
-    branches: ["master"]
+    branches: ["main"]
+
+env:
+  flutter_channel: "stable"
+  flutter_version: "3.24.1"
 
 jobs:
-  flutter_job:
-    # The machine, we can also use windows-latest or ubuntu-latest
-    # We are choosing macos-latest because we will be also building for iOS
-    runs-on: macos-latest
-
+  Android:
+    timeout-minutes: 120
+    runs-on: ubuntu-latest
+    needs: [Test]
     steps:
-      # Clones the project on the machine
       - uses: actions/checkout@v4
 
-      # Installs flutter and related dependency on this machine
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: "stable"
-          flutter-version: "3.24.0"
+          channel: ${{ env.flutter_channel }}
+          flutter-version: ${{ env.flutter_version }}
 
-      # Fetches proj dependencies from pub
+      - name: Setup store
+        uses: timheuer/base64-to-file@v1.2
+        with:
+          fileName: 'upload-keystore.jks'
+          fileDir: './android/app/'
+          encodedString: ${{ secrets.UPLOAD_STORE }}
+
+      - name: Setup store key
+        uses: timheuer/base64-to-file@v1.2
+        with:
+          fileName: 'key.properties'
+          fileDir: './android/'
+          encodedString: ${{ secrets.UPLOAD_KEY }}
+
       - name: Install dependencies
         run: flutter pub get
 
-      # Verifies if the dart code is formatted well
+      - name: Build bundle
+        run: flutter build appbundle --release --build-number=${{ github.run_number }}
+
+      - name: Upload apk to Firebase distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1.7.0
+        with:
+          appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_TOKEN }}
+          groups: all_testers
+          file: build/app/outputs/bundle/release/app-release.aab
+
+  Test:
+    timeout-minutes: 120
+    runs-on: ubuntu-latest
+    steps:
+      - name: Project clone
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.flutter_channel }}
+          flutter-version: ${{ env.flutter_version }}
+
+      - name: Install dependencies
+        run: flutter pub get
+
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
-        # --set-exit-if-changed stops execution if the any code is not well formatted
-        # --output=none prints files which needs to be formatted
 
-      # Checks for Symantic errors. Can be configured using analysis_options.yaml
       - name: Analyze project source
         run: flutter analyze --fatal-warnings
-        # --fatal-warnings stops execution if any warnings are found
 
-      # Runs unit test
       - name: Run tests
         run: flutter test
