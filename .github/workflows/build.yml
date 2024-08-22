@@ -18,8 +18,8 @@ jobs:
 
       - uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: '11'
+          distribution: "zulu"
+          java-version: "11"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -30,15 +30,15 @@ jobs:
       - name: Setup store
         uses: timheuer/base64-to-file@v1.2
         with:
-          fileName: 'upload-keystore.jks'
-          fileDir: './android/app/'
+          fileName: "upload-keystore.jks"
+          fileDir: "./android/app/"
           encodedString: ${{ secrets.UPLOAD_STORE }}
 
       - name: Setup store key
         uses: timheuer/base64-to-file@v1.2
         with:
-          fileName: 'key.properties'
-          fileDir: './android/'
+          fileName: "key.properties"
+          fileDir: "./android/"
           encodedString: ${{ secrets.UPLOAD_KEY }}
 
       - name: Install dependencies
