@@ -52,7 +52,7 @@ jobs:
         with:
           appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_TOKEN }}
-          groups: all_testers
+          groups: Testers
           file: build/app/outputs/bundle/release/app-release.aab
 
   Test:
