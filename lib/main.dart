@@ -4,7 +4,6 @@ import 'package:flutter/services.dart' show SystemChrome, DeviceOrientation;
 import 'package:flutter_native_splash/flutter_native_splash.dart'
     show FlutterNativeSplash;
 
-import 'app/app_module.dart';
 import 'app/app_widget.dart';
 
 void main() {
@@ -19,8 +18,6 @@ void main() {
   if (kReleaseMode) {
     debugPrint = (message, {int? wrapWidth}) {};
   }
-
-  registerInstances();
 
   runApp(const AppWidget());
 }

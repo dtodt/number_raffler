@@ -22,6 +22,6 @@
         "titleBar.inactiveForeground": "#15202b99"
     },
     "peacock.color": "#41fe96",
-    "dart.flutterSdkPath": "~/.puro/envs/stable/flutter",
-    "dart.sdkPath": "~/.puro/envs/stable/flutter/bin/cache/dart-sdk"
+    "dart.flutterSdkPath": "~/.puro/envs/latest/flutter",
+    "dart.sdkPath": "~/.puro/envs/latest/flutter/bin/cache/dart-sdk"
 }
