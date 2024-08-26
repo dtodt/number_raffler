@@ -25,6 +25,10 @@ dependencies:
 
   asp: ^2.0.2
   auto_injector: ^2.0.5
+  firebase_core: ^3.3.0
+  firebase_analytics: ^11.2.1
+  firebase_crashlytics: ^4.0.4
+  firebase_performance: ^0.10.0+4
   flutter_native_splash: ^2.4.1
   flutter_screenutil: ^5.9.3
 
