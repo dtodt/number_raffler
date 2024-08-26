@@ -41,23 +41,54 @@ jobs:
           fileDir: "./android/"
           encodedString: ${{ secrets.UPLOAD_KEY }}
 
+      - name: Setup firebase
+        uses: timheuer/base64-to-file@v1.2
+        with:
+          fileName: "google-services.json"
+          fileDir: "./android/app/"
+          encodedString: ${{ secrets.FIREBASE_ANDROID }}
+
+      - name: Setup firebase config
+        uses: timheuer/base64-to-file@v1.2
+        with:
+          fileName: "firebase_options.dart"
+          fileDir: "./lib/"
+          encodedString: ${{ secrets.FIREBASE_CONFIG }}
+
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build bundle
         run: flutter build appbundle --release --build-number=${{ github.run_number }}
 
-      - name: Upload apk to Firebase distribution
+      - name: Upload to firebase
         uses: wzieba/Firebase-Distribution-Github-Action@v1.7.0
         with:
-          appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
-          serviceCredentialsFileContent: ${{ secrets.FIREBASE_TOKEN }}
+          appId: ${{ secrets.ANDROID_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
           groups: Testers
           file: build/app/outputs/bundle/release/app-release.aab
+
+      - name: Upload bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: aab
+          path: build/app/outputs/bundle/release/app-release.aab
+
+      - name: Pack symbols
+        run: zip -r android.zip ./build/app/intermediates/merged_native_libs/release/out/lib
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v4
+        with:
+          name: symbols
+          path: ./android.zip
 
   Test:
     timeout-minutes: 120
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.final }}
     steps:
       - name: Project clone
         uses: actions/checkout@v4
@@ -79,3 +110,45 @@ jobs:
 
       - name: Run tests
         run: flutter test
+
+      - name: Extract version
+        id: version
+        run: |
+          version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | cut -d '+' -f 1)
+          echo "final=$version+${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+
+  Release:
+    timeout-minutes: 120
+    runs-on: ubuntu-latest
+    needs: [Android, Test]
+    steps:
+      - name: Project clone
+        uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: View files
+        run: ls ./artifacts
+
+      - name: Upload to google play
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+          packageName: ${{ secrets.ANDROID_PACKAGE }}
+          releaseFile: artifacts/aab/app-release.aab
+          track: internal
+
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        env:
+          VERSION: ${{needs.Test.outputs.version}}
+        with:
+          tag: $VERSION
+          name: Release $VERSION
+          body: Release $VERSION
+          artifacts: |
+            ./artifacts/aab/app-release.aab, 
+            ./artifacts/symbols/android.zip
