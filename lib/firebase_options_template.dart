@@ -4,7 +4,7 @@ import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
-/// Dummy class to instruct the user to fill in the Firebase options.
+/// Dummy class to instruct the user to fill in.
 /// TODO: Rename this class file to `firebase_options.dart` and fill in the options.
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
