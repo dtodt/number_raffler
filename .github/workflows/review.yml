@@ -95,6 +95,9 @@ jobs:
           fileDir: "./lib/"
           encodedString: ${{ secrets.FIREBASE_CONFIG }}
 
+      - name: View files
+        run: cat lib/firebase_options.dart
+  
       - name: Install dependencies
         run: flutter pub get
 
