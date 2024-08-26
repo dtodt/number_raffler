@@ -1,7 +1,7 @@
 name: Flutter Android
 
 on:
-  pull_request:
+  push:
     branches: ["main"]
 
 env:
@@ -61,14 +61,6 @@ jobs:
       - name: Build bundle
         run: flutter build appbundle --release --build-number=${{ github.run_number }}
 
-      - name: Upload to firebase
-        uses: wzieba/Firebase-Distribution-Github-Action@v1.7.0
-        with:
-          appId: ${{ secrets.ANDROID_APP_ID }}
-          serviceCredentialsFileContent: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
-          groups: Testers
-          file: build/app/outputs/bundle/release/app-release.aab
-
       - name: Upload bundle
         uses: actions/upload-artifact@v4
         with:
@@ -84,6 +76,10 @@ jobs:
           name: symbols
           path: ./android.zip
 
+      - env:
+          VERSION: ${{needs.Test.outputs.version}}
+        run: echo "Version $VERSION uploaded"
+  
   Test:
     timeout-minutes: 120
     runs-on: ubuntu-latest
@@ -152,3 +148,7 @@ jobs:
           artifacts: |
             ./artifacts/aab/app-release.aab, 
             ./artifacts/symbols/android.zip
+
+      - env:
+          VERSION: ${{needs.Test.outputs.version}}
+        run: echo "Version $VERSION released"
