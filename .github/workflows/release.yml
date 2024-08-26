@@ -1,4 +1,4 @@
-name: Flutter Android
+name: Flutter release
 
 on:
   push:
@@ -94,6 +94,13 @@ jobs:
         with:
           channel: ${{ env.flutter_channel }}
           flutter-version: ${{ env.flutter_version }}
+
+      - name: Setup firebase config
+        uses: timheuer/base64-to-file@v1.2
+        with:
+          fileName: "firebase_options.dart"
+          fileDir: "./lib/"
+          encodedString: ${{ secrets.FIREBASE_CONFIG }}
 
       - name: Install dependencies
         run: flutter pub get
