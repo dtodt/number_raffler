@@ -1,8 +1,16 @@
 name: Flutter release
 
 on:
-  push:
-    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      release_run:
+        description: "Run the release job"
+        required: true
+        default: "false"
+      store_upload:
+        description: "Send the release to google play"
+        required: true
+        default: "false"
 
 env:
   flutter_channel: "stable"
@@ -121,6 +129,7 @@ jobs:
           echo "final=$version+${{ github.run_number }}" >> "$GITHUB_OUTPUT"
 
   Release:
+    if: ${{ github.event.inputs.release_run == 'true' }}
     timeout-minutes: 120
     runs-on: ubuntu-latest
     needs: [Android, Test]
@@ -137,6 +146,7 @@ jobs:
         run: ls ./artifacts
 
       - name: Upload to google play
+        if: ${{ github.event.inputs.store_upload == 'true' }}
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJson: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
