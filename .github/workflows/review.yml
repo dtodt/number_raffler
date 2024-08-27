@@ -1,4 +1,4 @@
-name: Flutter Android
+name: Flutter review
 
 on:
   pull_request:
@@ -41,23 +41,43 @@ jobs:
           fileDir: "./android/"
           encodedString: ${{ secrets.UPLOAD_KEY }}
 
+      - name: Setup firebase
+        uses: timheuer/base64-to-file@v1.2
+        with:
+          fileName: "google-services.json"
+          fileDir: "./android/app/"
+          encodedString: ${{ secrets.FIREBASE_ANDROID }}
+
+      - name: Setup firebase config
+        uses: timheuer/base64-to-file@v1.2
+        with:
+          fileName: "firebase_options.dart"
+          fileDir: "./lib/"
+          encodedString: ${{ secrets.FIREBASE_CONFIG }}
+
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build bundle
         run: flutter build appbundle --release --build-number=${{ github.run_number }}
 
-      - name: Upload apk to Firebase distribution
+      - name: Upload to firebase
         uses: wzieba/Firebase-Distribution-Github-Action@v1.7.0
         with:
-          appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
-          serviceCredentialsFileContent: ${{ secrets.FIREBASE_TOKEN }}
+          appId: ${{ secrets.ANDROID_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
           groups: Testers
           file: build/app/outputs/bundle/release/app-release.aab
+
+      - env:
+          VERSION: ${{needs.Test.outputs.version}}
+        run: echo "Version $VERSION uploaded"
 
   Test:
     timeout-minutes: 120
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.final }}
     steps:
       - name: Project clone
         uses: actions/checkout@v4
@@ -68,6 +88,16 @@ jobs:
           channel: ${{ env.flutter_channel }}
           flutter-version: ${{ env.flutter_version }}
 
+      - name: Setup firebase config
+        uses: timheuer/base64-to-file@v1.2
+        with:
+          fileName: "firebase_options.dart"
+          fileDir: "./lib/"
+          encodedString: ${{ secrets.FIREBASE_CONFIG }}
+
+      - name: View files
+        run: cat lib/firebase_options.dart
+  
       - name: Install dependencies
         run: flutter pub get
 
@@ -79,3 +109,9 @@ jobs:
 
       - name: Run tests
         run: flutter test
+
+      - name: Extract version
+        id: version
+        run: |
+          version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | cut -d '+' -f 1)
+          echo "final=$version+${{ github.run_number }}" >> "$GITHUB_OUTPUT"
